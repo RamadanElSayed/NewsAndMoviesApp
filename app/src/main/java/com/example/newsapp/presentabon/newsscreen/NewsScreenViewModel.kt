@@ -5,10 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.newsapp.data.models.Article
 import com.example.newsapp.domain.usecase.GetTopHeadlineUseCase
 import com.example.newsapp.domain.usecase.SearchForNewsUseCase
-import com.example.newsapp.util.Resource
-import com.example.newsapp.data.models.Article
+import com.example.newsapp.util.Resource2
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -66,45 +66,34 @@ class NewsScreenViewModel @Inject constructor(
 
     private fun fetchNewsArticles(category: String) {
         viewModelScope.launch {
-            state = state.copy(isLoading = true, error = null)
-            when (val result = getTopHeadlineUseCase(category)) {
-                is Resource.Success -> {
-                    state = state.copy(
-                        articles = result.data ?: emptyList(),
-                        isLoading = false,
-                        error = null
-                    )
+            getTopHeadlineUseCase(category)
+                ?.collect { result ->
+                    handleResult(result)
                 }
-                is Resource.Error -> {
-                    state = state.copy(
-                        error = result.message,
-                        isLoading = false,
-                        articles = emptyList()
-                    )
-                }
-            }
         }
     }
 
     private fun performSearch(query: String) {
         viewModelScope.launch {
-            state = state.copy(isLoading = true, error = null)
-            when (val result = searchForNewsUseCase(query)) {
-                is Resource.Success -> {
-                    state = state.copy(
-                        articles = result.data ?: emptyList(),
-                        isLoading = false,
-                        error = null
-                    )
+            searchForNewsUseCase(query)
+                .collect { result ->
+                    handleResult(result)
                 }
-                is Resource.Error -> {
-                    state = state.copy(
-                        error = result.message,
-                        isLoading = false,
-                        articles = emptyList()
-                    )
-                }
-            }
+        }
+    }
+
+    private fun handleResult(result: Resource2<List<Article>>) {
+        state = when (result) {
+            is Resource2.Success -> state.copy(
+                articles = result.data ?: emptyList(),
+                isLoading = false,
+                error = null
+            )
+            is Resource2.Error -> state.copy(
+                error = result.message,
+                isLoading = false,
+                articles = emptyList()
+            )
         }
     }
 }

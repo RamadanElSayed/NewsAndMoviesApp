@@ -2,9 +2,11 @@ package com.example.newsapp.data.di
 
 import com.example.newsapp.data.repestory.NewsRepositoryImpl
 import com.example.newsapp.data.repestory.TMDBRepositoryImpl
+import com.example.newsapp.data.repestory.TMDBRepositoryImplUsingDOAPIRequest
 import com.example.newsapp.data.repestory.UserRepositoryImpl
 import com.example.newsapp.domain.repository.NewsRepository
 import com.example.newsapp.domain.repository.TMDBRepository
+import com.example.newsapp.domain.repository.TMDRepositoryUsingDOAPIRequest
 import com.example.newsapp.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
@@ -33,4 +35,12 @@ abstract class RepositoryModule {
     abstract fun bindUserRepository(
         userRepositoryImpl: UserRepositoryImpl
     ): UserRepository
+
+
+
+    @Binds
+    @Singleton
+    abstract fun bindTMDRepositoryUsingDOAPIRequest(
+        tmdRepositoryUsingDOAPIRequest: TMDBRepositoryImplUsingDOAPIRequest
+    ): TMDRepositoryUsingDOAPIRequest
 }
